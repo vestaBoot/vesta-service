@@ -1,0 +1,21 @@
+{
+  "name": "@vesta/services",
+  "version": "0.1.0",
+  "description": "Vesta Services",
+  "main": "vesta/es6/index.js",
+  "typings": "vesta/es6/index.d.ts",
+  "scripts": {
+    "start": "gulp",
+    "deploy": "gulp publish"
+  },
+  "keywords": ["Authentication", "Api", "Access"],
+  "author": "hbtb <bishehsary@gmail.com",
+  "contributors": ["javadkh2 <javad.khalilian@gmail.com>"],
+  "license": "ISC",
+  "dependencies": {},
+  "devDependencies": {
+    "@vesta/devmaid": "^0.4.6",
+    "gulp": "^4.0.0",
+    "typescript": "^3.2.2"
+  }
+}

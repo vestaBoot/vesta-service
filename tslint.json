@@ -1,0 +1,14 @@
+{
+  "extends": [
+    "tslint:recommended",
+    "tslint-react"
+  ],
+  "rules": {
+    "jsx-alignment": false,
+    "jsx-boolean-value": "never",
+    "jsx-wrap-multiline": false,
+    "triple-equals": false,
+    "no-empty-interface": false,
+    "comment-format": false
+  }
+}

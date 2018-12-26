@@ -1,0 +1,22 @@
+{
+    "compilerOptions": {
+        "target": "es6",
+        "module": "commonjs",
+        "lib": ["esnext", "dom"],
+        "jsx": "react",
+        "declaration": true,
+        "outDir": "./build",
+        "importHelpers": false,
+        "strict": true,
+        "noImplicitAny": true,
+        "alwaysStrict": true,
+        "allowSyntheticDefaultImports": true,
+        "esModuleInterop": true
+    },
+    "include": [
+        "src"
+    ],
+    "exclude": [
+        "build"
+    ]
+}
