@@ -56,7 +56,7 @@ export class Auth<T> {
             this.user = user;
             if (!user) {
                 return this.logout();
-            };
+            }
             if ((this.option.hooks as any).afterInit) {
                 (this.option.hooks as any)(user);
             }
