@@ -1,16 +1,9 @@
-import { AclAction, IAccess } from "./Access";
 import { IStorage } from "./Storage";
 
-export interface IPermissionCollection {
-    [resource: string]: string[];
-}
-
 export interface IAuthOption<T> {
-    authTokenKeyName?: string;
-    authUserKeyName?: string;
+    tokenKey?: string;
+    authUserKey?: string;
     storage: IStorage;
-    isAllowed: (resource: string, action: string) => boolean;
-    getAccessList: (resource: string) => IAccess;
     hooks?: {
         afterInit?: (user: T) => void;
     }
@@ -18,27 +11,19 @@ export interface IAuthOption<T> {
 
 export class Auth<T> {
 
-    public static getInstance<T>(option: IAuthOption<T>): Auth<T> {
-        if (!Auth.instance) {
-            Auth.instance = new Auth(option);
-        }
-        return Auth.instance;
-    }
-
-    private static instance: Auth<any>;
     private tokenKeyName: string = "auth-token";
     private userKeyName: string = "auth-user";
     private user: T = null as any as T;
 
-    constructor(private option: IAuthOption<T>) {
+    public constructor(private option: IAuthOption<T>) {
         if (!option.hooks) {
             option.hooks = {};
         }
-        if (option.authTokenKeyName) {
-            this.tokenKeyName = option.authTokenKeyName;
+        if (option.tokenKey) {
+            this.tokenKeyName = option.tokenKey;
         }
-        if (option.authUserKeyName) {
-            this.userKeyName = option.authUserKeyName;
+        if (option.authUserKey) {
+            this.userKeyName = option.authUserKey;
         }
         this.initUser();
     }
@@ -64,14 +49,6 @@ export class Auth<T> {
 
     public getToken(): Promise<string> {
         return this.option.storage.get<string>(this.tokenKeyName);
-    }
-
-    public getAccessList(resource: string): IAccess {
-        return this.option.getAccessList(resource);
-    }
-
-    public isAllowed(resource: string, action: string): boolean {
-        return this.option.isAllowed(resource, action);
     }
 
     private initUser() {

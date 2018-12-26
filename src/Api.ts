@@ -9,23 +9,14 @@ export interface IApiRequest<T> extends Promise<T> {
 
 export interface IApiOption {
     hooks?: {
-        beforeSend?: <T>(type: string, xhr: XMLHttpRequest, edge: string, data: T) => void;
+        beforeSend?: <T>(type: string, edge: string, data: T, headers: IRequestHeader) => void;
         afterReceive?: <T>(type: string, xhr: XMLHttpRequest, edge: string, data: T) => void;
     }
 }
 
 export class Api {
 
-    public static getInstance(endpoint: string, options?: IApiOption): Api {
-        if (!Api.instances[endpoint]) {
-            Api.instances[endpoint] = new Api(endpoint, options);
-        }
-        return Api.instances[endpoint];
-    }
-
-    private static instances: { [edge: string]: Api };
-
-    private constructor(private endpoint: string, private option?: IApiOption) {
+    public constructor(private endpoint: string, private option?: IApiOption) {
         if (!this.option) {
             this.option = {};
         }
@@ -35,24 +26,34 @@ export class Api {
     }
 
     public delete<T, U>(edge: string, data?: T, headers?: IRequestHeader) {
+        headers = headers || {};
+        this.onBeforeSend("GET", edge, data, headers);
         const queryString = data ? this.param(data) : "";
         return this.xhr<U>("DELETE", `${edge}${queryString}`, null, headers);
     }
 
     public get<T, U>(edge: string, data?: T, headers?: IRequestHeader) {
+        headers = headers || {};
+        this.onBeforeSend("GET", edge, data, headers);
         const queryString = data ? this.param(data) : "";
         return this.xhr<U>("GET", `${edge}${queryString}`, null, headers);
     }
 
     public post<T, U>(edge: string, data: T, headers?: IRequestHeader) {
+        headers = headers || {};
+        this.onBeforeSend("POST", edge, data, headers);
         return this.xhr<U>("POST", edge, JSON.stringify(data), headers);
     }
 
     public put<T, U>(edge: string, data: T, headers?: IRequestHeader) {
+        headers = headers || {};
+        this.onBeforeSend("PUT", edge, data, headers);
         return this.xhr<U>("PUT", edge, JSON.stringify(data), headers);
     }
 
     public upload<T, U>(edge: string, files: T, headers?: IRequestHeader) {
+        headers = headers || {};
+        this.onBeforeSend("UPLOAD", edge, files, headers);
         const formData = new FormData();
         for (let fields = Object.keys(files), i = 0, il = fields.length; i < il; ++i) {
             const value = (files as any)[fields[i]];
@@ -80,9 +81,9 @@ export class Api {
         }
     }
 
-    private onBeforeSend<T>(type: string, xhr: XMLHttpRequest, edge: string, data: T) {
+    private onBeforeSend<T>(type: string, edge: string, data: T, headers: IRequestHeader) {
         if ((this.option as any).hooks.beforeSend) {
-            (this.option as any).hooks.beforeSend(type, xhr, edge, data);
+            (this.option as any).hooks.beforeSend(type, edge, data, headers);
         }
     }
 
@@ -143,7 +144,6 @@ export class Api {
         const promise: IApiRequest<T> = new Promise<T>((resolve, reject) => {
             xhr.open(method, `${this.endpoint}/${edge}`, true);
             this.setHeaders(xhr, headers);
-            this.onBeforeSend(method, xhr, edge, data);
             xhr.onreadystatechange = () => {
                 if (xhr.readyState === XMLHttpRequest.DONE) {
                     this.onAfterReceive(method, xhr, edge, data);

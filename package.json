@@ -1,6 +1,6 @@
 {
   "name": "@vesta/services",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "description": "Vesta Services",
   "main": "vesta/es6/index.js",
   "typings": "vesta/es6/index.d.ts",
