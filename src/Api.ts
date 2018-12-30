@@ -7,7 +7,8 @@ export interface IApiRequest<T> extends Promise<T> {
     xhr?: XMLHttpRequest;
 }
 
-export interface IApiOption {
+export interface IApiConfig {
+    endpoint: string;
     hooks?: {
         beforeSend?: <T>(type: string, edge: string, data: T, headers: IRequestHeader) => void;
         afterReceive?: <T>(type: string, xhr: XMLHttpRequest, edge: string, data: T) => void;
@@ -16,12 +17,9 @@ export interface IApiOption {
 
 export class Api {
 
-    public constructor(private endpoint: string, private option?: IApiOption) {
-        if (!this.option) {
-            this.option = {};
-        }
-        if (!this.option.hooks) {
-            this.option.hooks = {};
+    public constructor(private config: IApiConfig) {
+        if (!config.hooks) {
+            config.hooks;
         }
     }
 
@@ -76,14 +74,14 @@ export class Api {
     }
 
     private onAfterReceive<T>(type: string, xhr: XMLHttpRequest, edge: string, data: T) {
-        if ((this.option as any).hooks.afterReceive) {
-            (this.option as any).hooks.afterReceive(type, xhr, edge, data);
+        if (this.config.hooks.afterReceive) {
+            this.config.hooks.afterReceive(type, xhr, edge, data);
         }
     }
 
     private onBeforeSend<T>(type: string, edge: string, data: T, headers: IRequestHeader) {
-        if ((this.option as any).hooks.beforeSend) {
-            (this.option as any).hooks.beforeSend(type, edge, data, headers);
+        if (this.config.hooks.beforeSend) {
+            this.config.hooks.beforeSend(type, edge, data, headers);
         }
     }
 
@@ -142,7 +140,7 @@ export class Api {
     private xhr<T>(method: string, edge: string, data: any, headers: any): IApiRequest<T> {
         const xhr = new XMLHttpRequest();
         const promise: IApiRequest<T> = new Promise<T>((resolve, reject) => {
-            xhr.open(method, `${this.endpoint}/${edge}`, true);
+            xhr.open(method, `${this.config.endpoint}/${edge}`, true);
             this.setHeaders(xhr, headers);
             xhr.onreadystatechange = () => {
                 if (xhr.readyState === XMLHttpRequest.DONE) {

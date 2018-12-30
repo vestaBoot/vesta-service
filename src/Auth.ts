@@ -1,6 +1,6 @@
 import { IStorage } from "./Storage";
 
-export interface IAuthOption<T> {
+export interface IAuthConfig<T> {
     tokenKey?: string;
     authUserKey?: string;
     storage: IStorage;
@@ -15,28 +15,28 @@ export class Auth<T> {
     private userKeyName: string = "auth-user";
     private user: T = null as any as T;
 
-    public constructor(private option: IAuthOption<T>) {
-        if (!option.hooks) {
-            option.hooks = {};
+    public constructor(private config: IAuthConfig<T>) {
+        if (!config.hooks) {
+            config.hooks = {};
         }
-        if (option.tokenKey) {
-            this.tokenKeyName = option.tokenKey;
+        if (config.tokenKey) {
+            this.tokenKeyName = config.tokenKey;
         }
-        if (option.authUserKey) {
-            this.userKeyName = option.authUserKey;
+        if (config.authUserKey) {
+            this.userKeyName = config.authUserKey;
         }
         this.initUser();
     }
 
     public logout(): Promise<void> {
-        return Promise.all([this.option.storage.remove(this.tokenKeyName), this.option.storage.remove(this.userKeyName)])
+        return Promise.all([this.config.storage.remove(this.tokenKeyName), this.config.storage.remove(this.userKeyName)])
             .then(() => { });
 
     }
 
     public login(user: T): Promise<void> {
         this.user = user;
-        return this.option.storage.set(this.userKeyName, JSON.stringify(user))
+        return this.config.storage.set(this.userKeyName, JSON.stringify(user))
     }
 
     public getUser(): T {
@@ -44,21 +44,21 @@ export class Auth<T> {
     }
 
     public setToken(token: string): Promise<void> {
-        return this.option.storage.set(this.tokenKeyName, token);
+        return this.config.storage.set(this.tokenKeyName, token);
     }
 
     public getToken(): Promise<string> {
-        return this.option.storage.get<string>(this.tokenKeyName);
+        return this.config.storage.get<string>(this.tokenKeyName);
     }
 
     private initUser() {
-        this.option.storage.get<T>(this.userKeyName).then((user) => {
+        this.config.storage.get<T>(this.userKeyName).then((user) => {
             this.user = user;
             if (!user) {
                 return this.logout();
             }
-            if ((this.option.hooks as any).afterInit) {
-                (this.option.hooks as any)(user);
+            if ((this.config.hooks as any).afterInit) {
+                (this.config.hooks as any)(user);
             }
         })
     }
