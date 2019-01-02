@@ -1,4 +1,4 @@
-export const AclAction = { Read: "read", Add: "add", Edit: "edit", Delete: "delete" }
+export const AclAction = { All: "*", Read: "read", Add: "add", Edit: "edit", Delete: "delete" }
 
 export enum AclPolicy { Deny, Allow }
 
