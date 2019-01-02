@@ -36,7 +36,7 @@ export class Auth<T> {
 
     public login(user: T): Promise<void> {
         this.user = user;
-        return this.config.storage.set(this.userKeyName, JSON.stringify(user))
+        return this.config.storage.set(this.userKeyName, user)
     }
 
     public getUser(): T {
@@ -58,7 +58,7 @@ export class Auth<T> {
                 return this.logout();
             }
             if ((this.config.hooks as any).afterInit) {
-                (this.config.hooks as any)(user);
+                (this.config.hooks as any).afterInit(user);
             }
         })
     }
