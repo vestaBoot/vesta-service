@@ -1,7 +1,8 @@
 import { IPermission } from "./Permission";
 import { IRole } from "./Role";
 
-export const AclAction = { All: "*", Read: "read", Add: "add", Edit: "edit", Delete: "delete", Detail: "detail" };
+export enum AclPolicy { Deny, Allow }
+export enum AclAction { All = "*", Read = "read", Add = "add", Edit = "edit", Delete = "delete", Detail = "detail" }
 
 export interface IAccess {
     [action: string]: boolean | undefined;
