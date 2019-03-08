@@ -5,4 +5,5 @@ export * from "./Crud";
 export * from "./Log";
 export * from "./Permission";
 export * from "./Role";
+export * from "./Status";
 export * from "./Storage";
