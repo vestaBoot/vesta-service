@@ -2,14 +2,14 @@ import { Err, IRequest, IResponse, Model, ValidationError } from "@vesta/core";
 import { Api } from "./Api";
 
 export interface IApiHooks {
-    afterRequest?: () => void,
-    beforeRequest?: () => void,
-    onError?: (error: Error) => void,
-    onSuccess?: (...info: any) => void,
+    afterRequest?: () => void;
+    beforeRequest?: () => void;
+    onError?: (error: Error) => void;
+    onSuccess?: (...info: any) => void;
 }
 
 export interface ICrudConfig {
-    api: Api,
+    api: Api;
     edge: string;
     hooks?: IApiHooks;
 }
@@ -30,8 +30,16 @@ export class Crud<T> {
             this.config.hooks.beforeRequest();
         }
         return this.config.api.get<T, IResponse<T>>(`${this.config.edge}/${id}`)
-            .then((result) => result.items[0])
+            .then((result) => {
+                if (this.config.hooks.afterRequest) {
+                    this.config.hooks.afterRequest();
+                }
+                return result.items[0];
+            })
             .catch((error) => {
+                if (this.config.hooks.afterRequest) {
+                    this.config.hooks.afterRequest();
+                }
                 if (this.config.hooks.onError) {
                     this.config.hooks.onError(error);
                 }
@@ -44,8 +52,16 @@ export class Crud<T> {
             this.config.hooks.beforeRequest();
         }
         return this.config.api.get<IRequest<T>, IResponse<T>>(this.config.edge, query)
-            .then((response) => response.items)
+            .then((response) => {
+                if (this.config.hooks.afterRequest) {
+                    this.config.hooks.afterRequest();
+                }
+                return response.items;
+            })
             .catch((error) => {
+                if (this.config.hooks.afterRequest) {
+                    this.config.hooks.afterRequest();
+                }
                 if (this.config.hooks.onError) {
                     this.config.hooks.onError(error);
                 }
@@ -58,8 +74,16 @@ export class Crud<T> {
             this.config.hooks.beforeRequest();
         }
         return this.config.api.get<IRequest<T>, IResponse<T>>(`${this.config.edge}/count`, query)
-            .then((response) => response.total)
+            .then((response) => {
+                if (this.config.hooks.afterRequest) {
+                    this.config.hooks.afterRequest();
+                }
+                return response.total;
+            })
             .catch((error) => {
+                if (this.config.hooks.afterRequest) {
+                    this.config.hooks.afterRequest();
+                }
                 if (this.config.hooks.onError) {
                     this.config.hooks.onError(error);
                 }
@@ -81,18 +105,24 @@ export class Crud<T> {
             })
             .then((response) => {
                 const id = (response.items[0] as any).id;
+                if (this.config.hooks.afterRequest) {
+                    this.config.hooks.afterRequest();
+                }
                 if (this.config.hooks.onSuccess) {
                     this.config.hooks.onSuccess("info_add_record", id);
                 }
                 return response.items[0];
             })
             .catch((error: Err) => {
+                if (this.config.hooks.afterRequest) {
+                    this.config.hooks.afterRequest();
+                }
                 if (this.config.hooks.onError) {
                     this.config.hooks.onError(error);
                 }
                 if (error.code === Err.Code.Validation.code) { throw error; }
                 return null;
-            })
+            });
     }
 
     public remove(id: number): Promise<boolean> {
@@ -101,12 +131,18 @@ export class Crud<T> {
         }
         return this.config.api.delete<IRequest<T>, IResponse<number>>(`${this.config.edge}/${id}`)
             .then((response) => {
+                if (this.config.hooks.afterRequest) {
+                    this.config.hooks.afterRequest();
+                }
                 if (this.config.hooks.onSuccess) {
                     this.config.hooks.onSuccess("info_delete_record", response.items[0]);
                 }
                 return true;
             })
             .catch((error) => {
+                if (this.config.hooks.afterRequest) {
+                    this.config.hooks.afterRequest();
+                }
                 if (this.config.hooks.onError) {
                     this.config.hooks.onError(error);
                 }
@@ -142,6 +178,9 @@ export class Crud<T> {
             })
             .then((response) => {
                 const id = (response.items[0] as any).id;
+                if (this.config.hooks.afterRequest) {
+                    this.config.hooks.afterRequest();
+                }
                 if (this.config.hooks.onSuccess) {
                     this.config.hooks.onSuccess("info_update_record", id);
                 }

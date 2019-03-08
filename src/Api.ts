@@ -12,28 +12,28 @@ export interface IApiConfig {
     hooks?: {
         beforeSend?: <T>(type: string, edge: string, data: T, headers: IRequestHeader) => void;
         afterReceive?: <T>(type: string, xhr: XMLHttpRequest, edge: string, data: T) => void;
-    }
+    };
 }
 
 export class Api {
 
     public constructor(private config: IApiConfig) {
         if (!config.hooks) {
-            config.hooks;
+            config.hooks = {};
         }
     }
 
     public delete<T, U>(edge: string, data?: T, headers?: IRequestHeader) {
         headers = headers || {};
         this.onBeforeSend("GET", edge, data, headers);
-        const queryString = data ? this.param(data) : "";
+        const queryString = data ? `?wrapper=${this.param(data)}` : "";
         return this.xhr<U>("DELETE", `${edge}${queryString}`, null, headers);
     }
 
     public get<T, U>(edge: string, data?: T, headers?: IRequestHeader) {
         headers = headers || {};
         this.onBeforeSend("GET", edge, data, headers);
-        const queryString = data ? this.param(data) : "";
+        const queryString = data ? `?wrapper=${this.param(data)}` : "";
         return this.xhr<U>("GET", `${edge}${queryString}`, null, headers);
     }
 
@@ -85,47 +85,8 @@ export class Api {
         }
     }
 
-    // jquery-param
     private param(data: any) {
-        const queryStringParts: string[] = [];
-        const rBracket = /\[\]$/;
-
-        return buildParams("", data).join("&").replace(/%20/g, "+");
-
-        function isArray(obj: any) {
-            return Object.prototype.toString.call(obj) === "[object Array]";
-        }
-
-        function add(k: string, v: any) {
-            if (typeof v === "function") { return; }
-            if (v === null || v === undefined) { return; }
-            queryStringParts.push(`${encodeURIComponent(k)}=${encodeURIComponent(v)}`);
-        }
-
-        function buildParams(prefix: string, obj: any) {
-            if (prefix) {
-                if (isArray(obj)) {
-                    for (let i = 0, len = obj.length; i < len; i++) {
-                        if (rBracket.test(prefix)) {
-                            add(prefix, obj[i]);
-                        } else {
-                            buildParams(`${prefix}[${typeof obj[i] === "object" ? i : ""}]`, obj[i]);
-                        }
-                    }
-                } else if (obj && String(obj) === "[object Object]") {
-                    for (let keys = Object.keys(obj), i = keys.length; i--;) {
-                        buildParams(`${prefix}[${keys[i]}]`, obj[keys[i]]);
-                    }
-                } else {
-                    add(prefix, obj);
-                }
-            } else {
-                for (let keys = Object.keys(obj), i = keys.length; i--;) {
-                    buildParams(keys[i], obj[keys[i]]);
-                }
-            }
-            return queryStringParts;
-        }
+        return encodeURIComponent(JSON.stringify(data));
     }
 
     private setHeaders(xhr: XMLHttpRequest, headers: any) {

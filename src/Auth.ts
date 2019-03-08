@@ -6,7 +6,7 @@ export interface IAuthConfig<T> {
     storage: IStorage;
     hooks?: {
         afterInit?: (user: T) => void;
-    }
+    };
 }
 
 export class Auth<T> {
@@ -29,14 +29,22 @@ export class Auth<T> {
     }
 
     public logout(): Promise<void> {
-        return Promise.all([this.config.storage.remove(this.tokenKeyName), this.config.storage.remove(this.userKeyName)])
-            .then(() => { });
+        return Promise.all([
+            this.config.storage.remove(this.tokenKeyName),
+            this.config.storage.remove(this.userKeyName),
+        ]).then(() => {
+            if (this.config.hooks.afterInit) {
+                this.config.hooks.afterInit(null);
+            }
+        }).catch((error) => {
+            //
+        });
 
     }
 
     public login(user: T): Promise<void> {
         this.user = user;
-        return this.config.storage.set(this.userKeyName, user)
+        return this.config.storage.set(this.userKeyName, user);
     }
 
     public getUser(): T {
@@ -57,9 +65,9 @@ export class Auth<T> {
             if (!user) {
                 return this.logout();
             }
-            if ((this.config.hooks as any).afterInit) {
-                (this.config.hooks as any).afterInit(user);
+            if (this.config.hooks.afterInit) {
+                this.config.hooks.afterInit(user);
             }
-        })
+        });
     }
 }

@@ -1,6 +1,7 @@
-export const AclAction = { All: "*", Read: "read", Add: "add", Edit: "edit", Delete: "delete" }
+import { IPermission } from "./Permission";
+import { IRole } from "./Role";
 
-export enum AclPolicy { Deny, Allow }
+export const AclAction = { All: "*", Read: "read", Add: "add", Edit: "edit", Delete: "delete", Detail: "detail" };
 
 export interface IAccess {
     [action: string]: boolean | undefined;
@@ -15,14 +16,21 @@ export interface IPermissions {
 
 export class Acl {
 
-    private defaultPolicy = AclPolicy.Deny;
     private permissions: IPermissions = {};
     private statePermissions: { [state: string]: IPermissions } = {};
 
-    public constructor() { }
-
-    public addPermissions(permissions: IPermissions) {
-        this.permissions = { ...this.permissions, ...permissions };
+    public addRole(role: IRole) {
+        // console.log("addRole", role);
+        if (!role || !role.status) { return; }
+        for (let i = 0, il = role.permissions.length; i < il; ++i) {
+            const permission = role.permissions[i] as IPermission;
+            if (!(permission.resource in this.permissions)) {
+                this.permissions[permission.resource] = [];
+            }
+            // if (this.permissions[permission.resource].indexOf(permission.action)) {
+            this.permissions[permission.resource].push(permission.action);
+            // }
+        }
     }
 
     public getAccessList(resource: string, ...actions: string[]): IAccess {
@@ -39,7 +47,7 @@ export class Acl {
     public hasAccessToState(state: string): boolean {
         if (!state) { return true; }
         const requiredPermissions = this.statePermissions[state];
-        if (!requiredPermissions) { return this.defaultPolicy === AclPolicy.Allow; }
+        if (!requiredPermissions) { return true; }
         for (let resources = Object.keys(requiredPermissions), i = resources.length; i--;) {
             const resource = resources[i];
             const actions = requiredPermissions[resource];
@@ -61,7 +69,7 @@ export class Acl {
             (userPermissions["*"] && (userPermissions["*"].indexOf("*") >= 0 || userPermissions["*"].indexOf(action) >= 0))) {
             return true;
         }
-        return this.defaultPolicy == AclPolicy.Allow;
+        return false;
     }
 
     /**
@@ -69,11 +77,7 @@ export class Acl {
      * @param state         The name of the state
      * @param permissions   Required permissions
      */
-    public registerPermisions(state: string, permissions: IPermissions) {
+    public register(state: string, permissions: IPermissions) {
         this.statePermissions[state] = permissions;
-    }
-
-    public setDefaultPolicy(policy: AclPolicy) {
-        this.defaultPolicy = policy;
     }
 }
