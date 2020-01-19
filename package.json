@@ -1,28 +1,28 @@
 {
-  "name": "@vesta/services",
-  "version": "0.2.0",
-  "description": "Vesta Services",
-  "main": "index.js",
-  "typings": "index.d.ts",
-  "scripts": {
-    "start": "gulp",
-    "deploy": "gulp publish"
-  },
-  "keywords": [
-    "Authentication",
-    "Api",
-    "Access"
-  ],
-  "author": "hbtb <bishehsary@gmail.com",
-  "contributors": [
-    "javadkh2 <khalilian.javad@gmail.com>"
-  ],
-  "license": "ISC",
-  "dependencies": {},
-  "devDependencies": {
-    "@vesta/core": "^2.0.10",
-    "@vesta/devmaid": "^0.4.6",
-    "gulp": "^4.0.0",
-    "typescript": "^3.2.2"
-  }
+    "name": "@vesta/services",
+    "version": "0.3.0",
+    "description": "Vesta Services",
+    "main": "index.js",
+    "typings": "index.d.ts",
+    "scripts": {
+        "start": "gulp",
+        "deploy": "gulp publish"
+    },
+    "keywords": [
+        "Authentication",
+        "Api",
+        "Access"
+    ],
+    "author": "hbtb <bishehsary@gmail.com",
+    "contributors": [
+        "javadkh2 <khalilian.javad@gmail.com>"
+    ],
+    "license": "ISC",
+    "dependencies": {},
+    "devDependencies": {
+        "@vesta/core": "^2.0.13",
+        "@vesta/devmaid": "^0.4.9",
+        "gulp": "^4.0.2",
+        "typescript": "^3.7.5"
+    }
 }

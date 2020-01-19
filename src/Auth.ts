@@ -60,14 +60,12 @@ export class Auth<T> {
     }
 
     private initUser() {
-        this.config.storage.get<T>(this.userKeyName).then((user) => {
-            this.user = user;
-            if (!user) {
-                return this.logout();
-            }
-            if (this.config.hooks.afterInit) {
-                this.config.hooks.afterInit(user);
-            }
-        });
+        this.user = this.config.storage.sync.get<T>(this.userKeyName);
+        if (!this.user) {
+            return this.logout();
+        }
+        if (this.config.hooks.afterInit) {
+            this.config.hooks.afterInit(this.user);
+        }
     }
 }

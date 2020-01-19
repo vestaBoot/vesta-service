@@ -1,8 +1,7 @@
-const { Indexer, Packager } = require("@vesta/devmaid");
+const { genIndex, Packager } = require("@vesta/devmaid");
 const { series } = require("gulp")
 
-const indexer = new Indexer("src");
-indexer.generate();
+genIndex("src");
 
 let pkgr = new Packager({
     root: __dirname,
